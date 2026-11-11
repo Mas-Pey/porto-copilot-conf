@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import type { FormEvent } from "react";
 import type { IContactSection } from "@/interface/portfolio";
 import { IconGlyph } from "@/components/atoms/IconGlyph";
 import { Panel } from "@/components/atoms/Panel";
 import { StatusDot } from "@/components/atoms/StatusDot";
 import { ContactFormCard, ContactPill } from "@/components/molecules/ContactFormCard";
+import { useContactForm } from "@/hooks/useContactForm";
 
 /** Props for the contact section organism. */
 export interface IContactSectionProps {
@@ -20,16 +20,33 @@ const SOCIAL_ICON_SIZES: Record<string, { width: number; height: number }> = {
   twitter: { width: 14, height: 15 },
 };
 
+/** Form field ids the backend contract requires. */
+const FIELD_NAMES = ["name", "email", "message"] as const;
+
 /**
  * Contact / CTA banner: ambient glows, narrative column with direct email and
- * social links, and the message form.
+ * social links, and the message form wired to `POST /api/messages`.
  */
 export function ContactSection({ contact }: IContactSectionProps) {
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const { feedback, status, isSubmitting, submit } = useContactForm(
+    contact.form.successMessage,
+  );
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatusMessage(contact.form.successMessage);
+
+    // `currentTarget` is null after the first `await`, so capture it up front.
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const values = FIELD_NAMES.map((name) => String(formData.get(name) ?? ""));
+
+    const [name = "", email = "", message = ""] = values;
+
+    const didSend = await submit({ name, email, message });
+
+    if (didSend) {
+      form.reset();
+    }
   }
 
   return (
@@ -120,7 +137,9 @@ export function ContactSection({ contact }: IContactSectionProps) {
             <ContactFormCard
               form={contact.form}
               onSubmit={handleSubmit}
-              statusMessage={statusMessage}
+              statusMessage={feedback}
+              statusTone={status === "error" ? "error" : "success"}
+              isSubmitting={isSubmitting}
             />
           </div>
         </div>

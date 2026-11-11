@@ -261,6 +261,8 @@ export interface IContactForm {
   readonly title: string;
   readonly fields: readonly IFormField[];
   readonly submitLabel: string;
+  /** Label shown while a submission is in flight. */
+  readonly submittingLabel?: string;
   readonly submitIconSrc: string;
   readonly successMessage: string;
 }

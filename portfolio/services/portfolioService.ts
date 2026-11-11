@@ -1,11 +1,37 @@
+import type { IApiMessage, ICreateMessagePayload } from "@/interface/api";
 import type { IPortfolioPage } from "@/interface/portfolio";
+import {
+  fetchProfile,
+  fetchProjects,
+  fetchSkills,
+  postMessage,
+} from "@/services/apiClient";
+import { mergeProfile, mergeProjects, mergeSkills } from "@/services/portfolioMapper";
+
+/** Result of a page load, including whether the backend answered. */
+export interface IPortfolioPageResult {
+  /** `true` when the Profile row was served by the backend. */
+  readonly isLive: boolean;
+  readonly data: IPortfolioPage;
+}
+
+/**
+ * Returns the bundled mock page synchronously.
+ *
+ * Used by the hook to seed its initial state so the first paint already has
+ * real content (no empty shell, no layout shift) while the API resolves.
+ */
+export function getMockPortfolioPage(): IPortfolioPage {
+  return portfolioPage;
+}
 
 /**
  * Mock content for the portfolio landing page.
  *
  * All copy, links, and asset paths live here so the Presentation Layer stays
- * data-agnostic. When the Backend CMS is ready, only this module is replaced
- * with a `fetch` call — the hook signature and every component stay untouched.
+ * data-agnostic. It doubles as the fallback when the Backend CMS is
+ * unreachable, and as the source of UI chrome (icons, tones, CTA links) that
+ * the API does not store.
  */
 const portfolioPage: IPortfolioPage = {
   header: {
@@ -596,8 +622,9 @@ const portfolioPage: IPortfolioPage = {
         },
       ],
       submitLabel: "Send Message",
+      submittingLabel: "Sending…",
       submitIconSrc: "/icons/contact-send.svg",
-      successMessage: "Your message is ready to send. Thanks for reaching out!",
+      successMessage: "Message sent. Thanks for reaching out!",
     },
   },
 
@@ -627,9 +654,55 @@ const portfolioPage: IPortfolioPage = {
 /**
  * Returns the portfolio landing page payload.
  *
- * Swap the body for an `await fetch(...)` against the Backend CMS; the return
- * type is already `Promise`-compatible at the hook boundary.
+ * Data is fetched from the Fastify Backend CMS. Any failure (backend down,
+ * timeout, non-2xx, malformed payload) degrades to the bundled mock content so
+ * the page always renders. Content authored in the CMS overrides the mock;
+ * icons, tones, and CTA chrome always come from the mock baseline.
  */
-export function getPortfolioPage(): IPortfolioPage {
-  return portfolioPage;
+export async function getPortfolioPage(): Promise<IPortfolioPage> {
+  return (await loadPortfolioPage()).data;
+}
+
+/**
+ * Loads the page payload and reports whether the backend served it.
+ * The hook uses the flag to decide if a retry is worthwhile.
+ */
+export async function loadPortfolioPage(): Promise<IPortfolioPageResult> {
+  const [profileResult, projectsResult, skillsResult] = await Promise.allSettled([
+    fetchProfile(),
+    fetchProjects(),
+    fetchSkills(),
+  ]);
+
+  const profile =
+    profileResult.status === "fulfilled" ? profileResult.value : null;
+  const apiProjects =
+    projectsResult.status === "fulfilled" ? projectsResult.value : [];
+  const apiSkills =
+    skillsResult.status === "fulfilled" ? skillsResult.value : [];
+
+  const isLive = profile !== null;
+
+  const profileSections =
+    profile === null
+      ? { hero: portfolioPage.hero, about: portfolioPage.about }
+      : mergeProfile(portfolioPage.hero, portfolioPage.about, profile);
+
+  return {
+    isLive,
+    data: {
+      ...portfolioPage,
+      hero: profileSections.hero,
+      about: profileSections.about,
+      skills: mergeSkills(portfolioPage.skills, apiSkills),
+      projects: mergeProjects(portfolioPage.projects, apiProjects),
+    },
+  };
+}
+
+/** Submits the contact form to `POST /api/messages`. */
+export async function sendMessage(
+  payload: ICreateMessagePayload,
+): Promise<IApiMessage> {
+  return postMessage(payload);
 }
