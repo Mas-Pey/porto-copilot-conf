@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Palette extracted from the Figma design */
+  --color-background: #0f131d;
+  --color-foreground: #dfe2f1;
+
+  --color-surface: #0a0e18;
+  --color-surface-raised: #111827;
+  --color-surface-solid: #1c1f2a;
+  --color-surface-inset: #262a35;
+
+  --color-ink-strong: #dfe2f1;
+  --color-ink-body: #c7c4d7;
+  --color-ink-muted: #908fa0;
+  --color-ink-faint: #464554;
+
+  --color-accent-violet: #c0c1ff;
+  --color-accent-violet-strong: #1000a9;
+  --color-accent-teal: #4fdbc8;
+  --color-accent-sky: #7bd0ff;
+  --color-accent-lilac: #e1e0ff;
+
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-ink-strong);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Keep anchor targets clear of the sticky header */
+section[id] {
+  scroll-margin-top: 80px;
 }
