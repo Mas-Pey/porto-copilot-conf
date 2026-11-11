@@ -1,0 +1,40 @@
+# ============================================
+# Line ending normalization
+# ============================================
+# Store text files with LF in the repository, regardless of the OS
+# that committed them. Windows checkouts still get CRLF in the
+# working tree, which avoids the "LF will be replaced by CRLF"
+# churn on every `git add`.
+
+* text=auto eol=lf
+
+# Explicit types — treat as text
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.json  text eol=lf
+*.css   text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Windows-only scripts keep CRLF
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Binary — never touch
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.pdf   binary
+
+# Lockfiles — generated, excluded from diff noise
+package-lock.json  -diff linguist-generated

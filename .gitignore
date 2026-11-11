@@ -1,0 +1,40 @@
+# ============================================
+# Root .gitignore — monorepo (abroad + portfolio)
+# ============================================
+# Each app keeps its own .gitignore for app-specific rules.
+# This file only covers workspace-level artifacts.
+
+# Dependencies (in case a package is hoisted to root later)
+/node_modules/
+**/node_modules/
+
+# Next.js build output
+**/.next/
+**/out/
+**/build/
+
+# Test / coverage output
+**/coverage/
+
+# TypeScript incremental build info
+**/*.tsbuildinfo
+
+# Environment files — never commit secrets
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Editor & OS artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Local tooling / caches
+.eslintcache
+.vercel/
+*.pem
+*.log
+
+# Agent / assistant scratch files (keep deliberate docs, ignore transient output)
+**/.tmp/
