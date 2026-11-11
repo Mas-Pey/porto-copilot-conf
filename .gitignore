@@ -20,9 +20,11 @@
 **/*.tsbuildinfo
 
 # Environment files — never commit secrets
+# Covers .env, .env.local, .env.production, .env.development, .env.*.local, …
+# The checked-in template is allowed back in explicitly.
 **/.env
-**/.env.local
-**/.env.*.local
+**/.env.*
+!**/.env.example
 
 # Editor & OS artifacts
 .DS_Store
@@ -38,3 +40,15 @@ Thumbs.db
 
 # Agent / assistant scratch files (keep deliberate docs, ignore transient output)
 **/.tmp/
+
+# Agent skill packs (installed via `npx skills add`; tooling, not app source)
+.agents/
+skills-lock.json
+
+# BE
+backend/node_modules/
+backend/dist/
+
+# BE — SQLite database files (recreated via `prisma db push`)
+**/*.db
+**/*.db-journal

@@ -1,0 +1,42 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Fastify backend service for the portfolio & abroad modules",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cors": "^11.4.1",
+    "@fastify/sensible": "^6.0.7",
+    "@prisma/adapter-better-sqlite3": "^7.10.1",
+    "@prisma/client": "7.10.1",
+    "@sinclair/typebox": "^0.34.52",
+    "dotenv": "^18.0.10",
+    "fastify": "^5.12.8",
+    "fastify-plugin": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "pino-pretty": "^13.2.0",
+    "prisma": "7.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
