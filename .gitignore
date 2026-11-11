@@ -52,3 +52,9 @@ backend/dist/
 # BE — SQLite database files (recreated via `prisma db push`)
 **/*.db
 **/*.db-journal
+
+# CMS App
+cms/.next/
+cms/out/
+cms/node_modules/
+cms/.env*.local
